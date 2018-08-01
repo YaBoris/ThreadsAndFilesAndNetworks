@@ -4,17 +4,17 @@
 #include <ctime>
 #include <chrono>
 #include <iostream>
-//#include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <random>
+#include <mutex>
 
 class writer
 {
 private:
 	const std::string get_file_name();
 	int ch_generator(char* content);
-	const std::string NAME = get_file_name();	
+	std::string NAME;
 public:
 	writer();
 	~writer();
