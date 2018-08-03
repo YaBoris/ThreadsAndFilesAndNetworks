@@ -8,6 +8,8 @@
 #include <sstream>
 #include <random>
 #include <mutex>
+#include <list>
+#include "thread_data.h"
 
 class writer
 {
@@ -18,6 +20,6 @@ private:
 public:
 	writer();
 	~writer();
-	int writeToFile();
+	int writeToFile(std::list<thread_data>& thrStatistics);
 };
 

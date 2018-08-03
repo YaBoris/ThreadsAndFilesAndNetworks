@@ -1,27 +1,29 @@
 #include "stdafx.h"
 #include "writer.h"
 
+
 int const SIZE_CONTENT = 100000;
 int const SIZE_BUFFER = 80;
 
 writer::writer(){
-
 }
 
 writer::~writer(){
 }
 
-int writer::writeToFile() {
+int writer::writeToFile(std::list<thread_data>& thrStatistics) {
+	int countExecution = 0;
 	auto temp_id = std::this_thread::get_id();
+	std::chrono::time_point<std::chrono::system_clock> begin, end;
 	std::mutex mtx;
 	{
 		std::lock_guard<std::mutex> guard(mtx);
 		NAME = get_file_name();
 	}
 	//begin time
-	//auto begin = std::chrono::system_clock::now();
 	char arrContentForFile[SIZE_CONTENT] = { 0 };
 	while (1) {
+		begin = std::chrono::system_clock::now();
 		//read exit.txt file for control when thread must be terminate
 		char exit;
 		std::ifstream isExit("exit.txt", std::ios::in);
@@ -37,6 +39,7 @@ int writer::writeToFile() {
 		}
 
 		//work with file with array of chars
+		countExecution++;
 		std::ofstream openToRight(NAME, std::ios::out);// | std::ios::app
 		if (!openToRight) {
 			{
@@ -55,12 +58,17 @@ int writer::writeToFile() {
 				openToRight.close();
 			}
 			//end time
-			//auto end = std::chrono::system_clock::now();
-			//auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-			//{
-			//	std::lock_guard<std::mutex> guard(mtx);
-			//	std::cout << millisec.count() << " msec. File is OK!" << std::endl;
-			//}
+			end = std::chrono::system_clock::now();
+			auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+
+			thread_data thisData;
+			thisData.set_counteExecution(countExecution);
+			thisData.set_ID(temp_id);
+			thisData.set_timing(millisec.count());
+
+			std::lock_guard<std::mutex> guard(mtx);
+			thrStatistics.push_back(thisData);
+
 			//REMOVE WHEN WILL CREATED READER
 			//break;
 			//
